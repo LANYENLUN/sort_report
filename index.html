@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>氣泡排序法視覺化</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; }
+        #array-container { display: flex; justify-content: center; align-items: flex-end; height: 200px; margin-top: 20px; }
+        .bar { width: 30px; margin: 0 5px; background-color: #007bff; color: white; text-align: center; transition: height 0.3s; }
+        .swapping { background-color: #dc3545; } /* 交換時顯示紅色 */
+    </style>
+</head>
+<body>
+    <h2>氣泡排序法視覺化 (Bubble Sort)</h2>
+    <input type="text" id="inputArray" value="40, 30, 60, 50, 20" placeholder="輸入數字，用逗號分隔">
+    <button onclick="startSort()">開始排序</button>
+    <div id="array-container"></div>
+
+    <script>
+        async function bubbleSort(arr) {
+            let n = arr.length;
+            for (let i = 0; i < n - 1; i++) {
+                for (let j = 0; j < n - i - 1; j++) {
+                    // 視覺化：標示正在比較的元素
+                    await highlightSwap(j, j + 1);
+                    
+                    if (arr[j] > arr[j + 1]) {
+                        // 交換數值
+                        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+                        // 更新顯示
+                        renderArray(arr);
+                        await new Promise(resolve => setTimeout(resolve, 500)); // 暫停
+                    }
+                }
+            }
+            return arr;
+        }
+
+        // 渲染長條圖
+        function renderArray(arr) {
+            const container = document.getElementById("array-container");
+            container.innerHTML = "";
+            arr.forEach(value => {
+                const bar = document.createElement("div");
+                bar.className = "bar";
+                bar.style.height = value * 2 + "px"; // 調整高度比例
+                bar.innerText = value;
+                container.appendChild(bar);
+            });
+        }
+
+        // 簡單的動畫效果
+        async function highlightSwap(i, j) {
+            const bars = document.getElementsByClassName("bar");
+            bars[i].classList.add("swapping");
+            bars[j].classList.add("swapping");
+            await new Promise(resolve => setTimeout(resolve, 300));
+            bars[i].classList.remove("swapping");
+            bars[j].classList.remove("swapping");
+        }
+
+        async function startSort() {
+            const input = document.getElementById("inputArray").value;
+            let arr = input.split(',').map(Number);
+            renderArray(arr);
+            await bubbleSort(arr);
+        }
+    </script>
+</body>
+</html>
