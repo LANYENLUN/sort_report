@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>選擇排序 Selection Sort — 示範教學</title>
+    <title>插入排序 Insertion Sort — 示範教學</title>
     <style>
         :root{--bg:#0f1724;--panel:#0b1220;--muted:#9aa7c0;--accent:#4ac1ff;--accent-2:#ffa94d;--ok:#2bd39b;--danger:#ff6b6b;--card:#0b1220}
         *{box-sizing:border-box}
@@ -42,23 +42,24 @@
 </head>
 <body>
     <div class="wrap">
-        <h1>🔷 選擇排序法</h1>
+        <h1>↪️ 插入排序法</h1>
         <div style="margin-top:8px">
             <a href="index.html" class="badge">回首頁</a>
             <a href="bubble_sort.html" class="badge" style="margin-left:8px">氣泡排序 Bubble Sort</a>
-            <a href="insertion_sort.html" class="badge" style="margin-left:8px">插入排序 Insertion Sort</a>
+            <a href="selection_sort.html" class="badge" style="margin-left:8px">選擇排序 Selection Sort</a>
         </div>
-        <div class="meta">Selection Sort — 每輪選出最小/最大的元素並放到已排序區</div>
+
+        <div class="meta">Insertion Sort — 逐步把每個元素插入到已排序區域</div>
 
         <div class="panel">
             <div class="desc">
-                原理：選擇排序會在未排序的區間中找到最小（或最大）元素，將其與該區間的起始位置交換，然後將起始位置向右移動一格。重複直到所有元素排序完成。這個範例會逐步顯示比較與交換過程。
+                原理：插入排序會將陣列分成已排序與未排序兩部分，從未排序區取出第一個元素（key），向左比較並將較大的元素依序右移，直到找到合適位置把 key 插入。重複直到整個陣列排序完成。
             </div>
 
             <div class="stats">
                 <div class="stat">第 <span id="pass">0</span> 輪 / 共 <span id="totalPass">0</span> 輪</div>
                 <div class="stat">比較次數：<span id="comp">0</span></div>
-                <div class="stat">交換次數：<span id="swaps">0</span></div>
+                <div class="stat">移動次數：<span id="swaps">0</span></div>
                 <div class="stat">狀態：<span id="status">暫停</span></div>
             </div>
 
@@ -85,7 +86,7 @@
             <div class="legend">
                 <div class="item"><span class="dot un"></span> 未排序</div>
                 <div class="item"><span class="dot cmp"></span> 比較中</div>
-                <div class="item"><span class="dot swap"></span> 交換中</div>
+                <div class="item"><span class="dot swap"></span> 移動中</div>
                 <div class="item"><span class="dot done"></span> 已排序</div>
             </div>
         </div>
@@ -151,7 +152,7 @@
                 if(bars[i]) bars[i].classList.add('swap');
                 if(bars[j]) bars[j].classList.add('swap');
             }else if(mode==='sorted'){
-                for(let s=0;s<stats.pass;s++){ if(bars[s]) bars[s].classList.add('sorted'); }
+                for(let s=0;s<=stats.pass;s++){ if(bars[s]) bars[s].classList.add('sorted'); }
             }
         }
 
@@ -162,34 +163,35 @@
             if(stepRequested){ stepRequested=false; paused=true; }
         }
 
-        async function selectionSortControlled(){
+        async function insertionSortControlled(){
             working = true; paused = false; setStatus('執行中');
             stats = {pass:0, comps:0, swaps:0}; updateStats();
             const asc = orderEl.value==='asc';
             const n = array.length;
-            for(let i=0;i<n-1;i++){
-                stats.pass = i+1; updateStats();
-                let minIdx = i;
-                for(let j=i+1;j<n;j++){
+            for(let i=1;i<n;i++){
+                stats.pass = i; updateStats();
+                let key = array[i];
+                let j = i-1;
+                while(j>=0){
                     if(paused) await doPause();
                     stats.comps++; updateStats();
-                    colorPair(minIdx,j,'compare');
+                    colorPair(j, j+1, 'compare');
                     await sleep(Number(speedEl.value));
-                    if(asc ? array[j] < array[minIdx] : array[j] > array[minIdx]){
-                        minIdx = j;
+                    if(asc ? array[j] > key : array[j] < key){
+                        colorPair(j, j+1, 'swap');
+                        await sleep(Number(speedEl.value)/2);
+                        array[j+1] = array[j];
+                        stats.swaps++; updateStats();
+                        render();
+                        await sleep(Number(speedEl.value)/2);
+                        j--;
+                    }else{
+                        break;
                     }
-                    render();
                 }
-                if(minIdx !== i){
-                    colorPair(i,minIdx,'swap');
-                    await sleep(Number(speedEl.value)/2);
-                    const t = array[i]; array[i]=array[minIdx]; array[minIdx]=t;
-                    stats.swaps++; updateStats();
-                    render();
-                    await sleep(Number(speedEl.value)/2);
-                }
-                colorPair(null,null,'sorted');
+                array[j+1] = key;
                 render();
+                colorPair(null,null,'sorted');
             }
             const bars = visual.children;
             for(let k=0;k<bars.length;k++) bars[k].classList.add('sorted');
@@ -202,7 +204,7 @@
             if(parsed.length>0) array = parsed.slice();
             if(array.length===0){ array = randArray(7,100); inputEl.value = array.join(','); }
             render();
-            selectionSortControlled();
+            insertionSortControlled();
         });
 
         pauseBtn.addEventListener('click', ()=>{ if(!working) return; paused=true; setStatus('暫停'); });
