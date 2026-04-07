@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>綜合比較與效能實驗 — 排序演示</title>
+    <style>
+        :root {
+            --bg: #fff0f5;         
+            --panel: rgba(255, 255, 255, 0.55); 
+            --muted: #a84b7d;      
+            --accent: #ff85b3;     
+            --accent-2: #ff529a;   
+            --text-main: #8a1c4a;  
+            --card-border: rgba(255, 182, 213, 0.6);
+        }
+        * { box-sizing: border-box; }
+        
+        body {
+            margin: 0;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg) 0%, #ffc4db 100%);
+            color: var(--text-main);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .wrap { 
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto; 
+        }
+
+        .header { text-align: center; margin-bottom: 30px; position: relative; }
+        .header h1 { font-size: 28px; margin: 0 0 10px 0; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .header .sub-title { color: var(--muted); font-size: 15px; margin-bottom: 15px; }
+        .btn-home { display: inline-block; text-decoration: none; border: 1px solid var(--accent); color: var(--text-main); padding: 6px 16px; border-radius: 999px; font-size: 14px; background: rgba(255,255,255,0.6); transition: all 0.2s; }
+        .btn-home:hover { background: var(--accent); color: white; }
+
+        .section-card {
+            background: var(--panel);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(255, 136, 182, 0.1);
+        }
+        .section-title { font-size: 18px; font-weight: bold; margin-top: 0; margin-bottom: 16px; display: flex; align-items: center; color: var(--text-main); }
+        .section-title::before { content: ""; display: inline-block; width: 6px; height: 20px; background: var(--accent-2); margin-right: 10px; border-radius: 4px; }
+        .desc-text { line-height: 1.8; color: #6d2040; font-size: 15px; margin-bottom: 15px; }
+
+        /* 按鈕樣式 */
+        .btn-animated {
+            background: linear-gradient(270deg, #ff85b3, #ff529a, #ee5d8f, #ff85b3);
+            background-size: 300% 300%;
+            animation: gradientMove 3s ease infinite;
+            border: none; color: white; padding: 12px 24px; border-radius: 8px;
+            font-weight: 600; font-size: 16px; cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s;
+            display: inline-flex; align-items: center; gap: 8px; width: 100%; justify-content: center;
+        }
+        @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .btn-animated:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(255, 82, 154, 0.4); }
+        .btn-animated:active { transform: translateY(0); }
+        .btn-animated:disabled { background: #dcdcdc; color: #888; cursor: not-allowed; animation: none; transform: none; box-shadow: none; }
+
+        /* 表格樣式 */
+        table { width: 100%; border-collapse: collapse; font-size: 15px; background: rgba(255,255,255,0.7); border-radius: 8px; overflow: hidden; text-align: right;}
+        th, td { border: 1px solid var(--card-border); padding: 14px; color: #6d2040; }
+        th { background-color: rgba(255, 182, 213, 0.4); font-weight: 600; text-align: center;}
+        td:first-child { text-align: center; font-weight: bold; background-color: rgba(255, 182, 213, 0.1); }
+        
+        .loading { font-size: 14px; color: var(--accent-2); margin-top: 10px; text-align: center; font-weight: bold; min-height: 20px;}
+        .time-cell { font-family: Consolas, monospace; font-size: 15px; }
+        .winner { color: #2e8b57; font-weight: bold; }
+        .loser { color: #c0392b; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        
+        <div class="header">
+            <h1>📊 綜合比較與效能實驗</h1>
+            <div class="sub-title">操作變因：數據規模 N ｜ 應變變因：執行時間 (毫秒)</div>
+            <a href="index.html" class="btn-home">← 回到首頁</a>
+        </div>
+
+        <div class="section-card">
+            <h2 class="section-title">實驗設計說明</h2>
+            <div class="desc-text">
+                本實驗旨在測量不同排序演算法在處理大量數據時的真實效能。<br>
+                為了確保實驗的準確性：<br>
+                1. <strong>無視覺化干擾：</strong>使用拔除所有動畫與 DOM 操作的「純演算法」進行運算。<br>
+                2. <strong>高精度計時：</strong>採用 <code>performance.now()</code> 測量執行時間（單位：毫秒 ms）。<br>
+                3. <strong>公平測試：</strong>每一輪規模測試中，五種排序法皆對「同一份亂數產生的陣列複本」進行排序。<br>
+                <br>
+                <em>（注意：當 N 達到 30,000 或 50,000 時，O(n²) 的演算法會需要耗費數秒鐘運算，網頁可能會短暫停頓，此為正常現象。）</em>
+            </div>
+            
+            <button id="runBtn" class="btn-animated">▶ 開始執行自動化效能實驗</button>
+            <div id="statusText" class="loading"></div>
+        </div>
+
+        <div class="section-card">
+            <h2 class="section-title">實驗結果 (單位：毫秒 ms)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>排序演算法 \ 資料規模 N</th>
+                        <th>N = 1,000</th>
+                        <th>N = 5,000</th>
+                        <th>N = 10,000</th>
+                        <th>N = 30,000</th>
+                    </tr>
+                </thead>
+                <tbody id="resultTableBody">
+                    <tr><td>氣泡排序 Bubble Sort</td><td id="b-1">--</td><td id="b-2">--</td><td id="b-3">--</td><td id="b-4">--</td></tr>
+                    <tr><td>選擇排序 Selection Sort</td><td id="s-1">--</td><td id="s-2">--</td><td id="s-3">--</td><td id="s-4">--</td></tr>
+                    <tr><td>插入排序 Insertion Sort</td><td id="i-1">--</td><td id="i-2">--</td><td id="i-3">--</td><td id="i-4">--</td></tr>
+                    <tr><td>合併排序 Merge Sort</td><td id="m-1">--</td><td id="m-2">--</td><td id="m-3">--</td><td id="m-4">--</td></tr>
+                    <tr><td>快速排序 Quick Sort</td><td id="q-1">--</td><td id="q-2">--</td><td id="q-3">--</td><td id="q-4">--</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 1. 純淨版排序演算法實作 (Pure Functions) ---
+
+        // 氣泡排序
+        function bubbleSortPure(arr) {
+            let n = arr.length;
+            for (let i = 0; i < n - 1; i++) {
+                let swapped = false;
+                for (let j = 0; j < n - 1 - i; j++) {
+                    if (arr[j] > arr[j + 1]) {
+                        let temp = arr[j]; arr[j] = arr[j + 1]; arr[j + 1] = temp;
+                        swapped = true;
+                    }
+                }
+                if (!swapped) break;
+            }
+        }
+
+        // 選擇排序
+        function selectionSortPure(arr) {
+            let n = arr.length;
+            for (let i = 0; i < n - 1; i++) {
+                let minIdx = i;
+                for (let j = i + 1; j < n; j++) {
+                    if (arr[j] < arr[minIdx]) minIdx = j;
+                }
+                if (minIdx !== i) {
+                    let temp = arr[i]; arr[i] = arr[minIdx]; arr[minIdx] = temp;
+                }
+            }
+        }
+
+        // 插入排序
+        function insertionSortPure(arr) {
+            let n = arr.length;
+            for (let i = 1; i < n; i++) {
+                let key = arr[i];
+                let j = i - 1;
+                while (j >= 0 && arr[j] > key) {
+                    arr[j + 1] = arr[j];
+                    j--;
+                }
+                arr[j + 1] = key;
+            }
+        }
+
+        // 合併排序 (為避免遞迴深度問題與額外陣列開銷，這裡寫一個完整的遞迴版本)
+        function mergeSortPure(arr) {
+            if (arr.length <= 1) return arr;
+            const mid = Math.floor(arr.length / 2);
+            const left = mergeSortPure(arr.slice(0, mid));
+            const right = mergeSortPure(arr.slice(mid));
+            
+            let result = [], i = 0, j = 0;
+            while (i < left.length && j < right.length) {
+                if (left[i] < right[j]) result.push(left[i++]);
+                else result.push(right[j++]);
+            }
+            return result.concat(left.slice(i)).concat(right.slice(j));
+        }
+
+        // 快速排序
+        function quickSortPure(arr, low = 0, high = arr.length - 1) {
+            if (low < high) {
+                let pivot = arr[high];
+                let i = low - 1;
+                for (let j = low; j < high; j++) {
+                    if (arr[j] < pivot) {
+                        i++;
+                        let temp = arr[i]; arr[i] = arr[j]; arr[j] = temp;
+                    }
+                }
+                let temp = arr[i + 1]; arr[i + 1] = arr[high]; arr[high] = temp;
+                let pi = i + 1;
+                quickSortPure(arr, low, pi - 1);
+                quickSortPure(arr, pi + 1, high);
+            }
+        }
+
+        // --- 2. 實驗框架 ---
+
+        function generateRandomArray(size) {
+            let arr = new Array(size);
+            for (let i = 0; i < size; i++) {
+                arr[i] = Math.floor(Math.random() * 100000);
+            }
+            return arr;
+        }
+
+        // 高精度測速封裝
+        function measureTime(name, sortFunc, originalArray, isMergeSort = false) {
+            let testArray = originalArray.slice(); // 複製一份，確保公平
+            let start = performance.now();
+            
+            if (isMergeSort) {
+                mergeSortPure(testArray); // Merge Sort 在這版寫法有回傳值，但不影響測速
+            } else {
+                sortFunc(testArray);
+            }
+            
+            let end = performance.now();
+            return (end - start).toFixed(2); // 回傳毫秒，取小數點後兩位
+        }
+
+        // 非同步等待，避免卡死 UI
+        const yieldToMain = () => new Promise(resolve => setTimeout(resolve, 0));
+
+        const sizes = [1000, 5000, 10000, 30000];
+        const runBtn = document.getElementById('runBtn');
+        const statusText = document.getElementById('statusText');
+
+        runBtn.addEventListener('click', async () => {
+            runBtn.disabled = true;
+            
+            // 清空舊數據
+            for(let i=1; i<=4; i++) {
+                document.getElementById(`b-${i}`).innerHTML = '--';
+                document.getElementById(`s-${i}`).innerHTML = '--';
+                document.getElementById(`i-${i}`).innerHTML = '--';
+                document.getElementById(`m-${i}`).innerHTML = '--';
+                document.getElementById(`q-${i}`).innerHTML = '--';
+            }
+
+            for (let colIdx = 0; colIdx < sizes.length; colIdx++) {
+                let size = sizes[colIdx];
+                let uiIdx = colIdx + 1;
+                
+                statusText.innerText = `⏳ 正在產生 ${size} 筆隨機測試資料並進行運算中... (請耐心等候)`;
+                await yieldToMain(); // 讓畫面有時間更新文字
+
+                let testData = generateRandomArray(size);
+
+                // Bubble Sort
+                let bTime = measureTime('Bubble', bubbleSortPure, testData);
+                document.getElementById(`b-${uiIdx}`).innerHTML = `<span class="time-cell">${bTime}</span>`;
+                await yieldToMain();
+
+                // Selection Sort
+                let sTime = measureTime('Selection', selectionSortPure, testData);
+                document.getElementById(`s-${uiIdx}`).innerHTML = `<span class="time-cell">${sTime}</span>`;
+                await yieldToMain();
+
+                // Insertion Sort
+                let iTime = measureTime('Insertion', insertionSortPure, testData);
+                document.getElementById(`i-${uiIdx}`).innerHTML = `<span class="time-cell">${iTime}</span>`;
+                await yieldToMain();
+
+                // Merge Sort
+                let mTime = measureTime('Merge', mergeSortPure, testData, true);
+                document.getElementById(`m-${uiIdx}`).innerHTML = `<span class="time-cell winner">${mTime}</span>`;
+                await yieldToMain();
+
+                // Quick Sort
+                let qTime = measureTime('Quick', quickSortPure, testData);
+                document.getElementById(`q-${uiIdx}`).innerHTML = `<span class="time-cell winner">${qTime}</span>`;
+                await yieldToMain();
+            }
+
+            statusText.innerText = "✅ 實驗完成！";
+            runBtn.disabled = false;
+        });
+    </script>
+</body>
+</html>
