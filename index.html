@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>排序演示</title>
+    <title>排序演示 — 全粉紅主題</title>
     <style>
         :root {
             /* 調整為更和諧、無分裂感的全粉紅色階 */
@@ -97,6 +97,18 @@
             transform: translateY(1px);
             filter: brightness(0.95);
         }
+
+        /* 特殊按鈕樣式 (綜合實驗專用) */
+        .menu-link.special {
+            background: linear-gradient(180deg, #ff85b3, #ff529a);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 15px rgba(255, 82, 154, 0.4);
+        }
+        .menu-link.special:hover {
+            filter: brightness(1.1);
+            box-shadow: 0 8px 25px rgba(255, 82, 154, 0.6);
+        }
     </style>
 </head>
 <body>
@@ -110,6 +122,9 @@
             <a href="insertion_sort.html" class="menu-link">↪️ 插入排序 Insertion Sort</a>
             <a href="merge_sort.html" class="menu-link">🔀 合併排序 Merge Sort</a>
             <a href="quick_sort.html" class="menu-link">⚡ 快速排序 Quick Sort</a>
+            
+            <hr style="width: 100%; border: 0; border-top: 2px dashed rgba(255, 182, 213, 0.6); margin: 10px 0;">
+            <a href="compare.html" class="menu-link special">📊 綜合效能比較實驗</a>
         </div>
     </div>
 </body>
