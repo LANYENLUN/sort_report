@@ -3,200 +3,532 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>快速排序 Quick Sort — 視覺化步驟示範</title>
+    <title>快速排序 Quick Sort — 視覺化教學</title>
     <style>
-        :root{
-            --bg:#fff0f6;--panel:#ffd6e8;--muted:#7e3b5d;--accent:#ff8fbf;--accent-2:#ff6aa3;--ok:#ffb6d5;--danger:#dd426e;--card:#ffe1eb
+        :root {
+            --bg: #fff0f5;         
+            --panel: rgba(255, 255, 255, 0.55); 
+            --muted: #a84b7d;      
+            --accent: #ff85b3;     
+            --accent-2: #ff529a;   
+            --text-main: #8a1c4a;  
+            --card-border: rgba(255, 182, 213, 0.6);
+            --code-bg: #4d1531;
         }
-        *{box-sizing:border-box}
-        body{margin:0;font-family:Inter,Segoe UI,Arial;background:linear-gradient(180deg,var(--bg),#ffd6e8);color:#4d1531;padding:28px}
-        .wrap{max-width:980px;margin:0 auto}
-        h1{display:flex;align-items:center;gap:10px;font-weight:600}
-        .meta{color:var(--muted);margin-top:6px}
-
-        .panel{background:var(--panel);border-radius:12px;padding:18px;margin-top:16px;box-shadow:0 8px 28px rgba(255,138,182,0.08)}
-        .desc{background:rgba(255,255,255,.45);padding:12px;border-radius:8px;color:var(--muted)}
-
-        .stats{display:flex;gap:10px;margin:12px 0;align-items:center}
-        .stat{padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.55);font-size:13px;color:#4d1531}
-        .controls{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
-        input[type=text]{padding:8px;border-radius:8px;border:none;background:rgba(255,255,255,.6);color:#4d1531;min-width:260px}
-        button{background:linear-gradient(180deg,var(--accent),var(--accent-2));border:none;color:white;padding:10px 14px;border-radius:999px;cursor:pointer;transition:transform .12s ease,filter .12s ease,box-shadow .12s ease}
-        button:hover{transform:translateY(-2px);filter:brightness(1.04);box-shadow:0 6px 20px rgba(255,136,183,0.12)}
-        button:active{transform:translateY(0);filter:brightness(.95)}
-        button:focus{outline:3px solid rgba(255,136,183,0.18);outline-offset:2px}
-        button.ghost{background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,.35)}
-        button.ghost:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.5)}
-        button.warn{background:linear-gradient(180deg,var(--accent-2),#ee5d8f);color:white}
-        .small{padding:8px 10px;font-size:13px}
-        #visualWrap{height:320px;margin-top:14px;display:flex;align-items:center;justify-content:center}
-        #visual{width:100%;height:100%;display:flex;align-items:flex-end;gap:10px;padding:18px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.35),transparent)}
-        .bar{flex:1;display:flex;align-items:flex-end;justify-content:center;background:linear-gradient(180deg,#ffc7df,#ff9bcf);color:#4d1531;border-radius:6px 6px 4px 4px;padding:6px 4px;font-weight:600}
+        * { box-sizing: border-box; }
         
-        /* 視覺化狀態顏色 */
-        .bar.compare{background:linear-gradient(180deg,#ffd86f,#ffb3a8)}
-        .bar.swap{background:linear-gradient(180deg,#ff8aa9,#ff5f8f)}
-        .bar.sorted{background:linear-gradient(180deg,#ffd4e5,#ffb0ca)}
-        .bar.pivot{background:linear-gradient(180deg,#b088f9,#8b5cf6);color:white;} /* 新增 Pivot 顏色 */
+        body {
+            margin: 0;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg) 0%, #ffc4db 100%);
+            color: var(--text-main);
+            padding: 20px;
+            min-height: 100vh;
+        }
 
-        .legend{display:flex;gap:12px;align-items:center;margin-top:10px;color:var(--muted);flex-wrap:wrap;}
-        .legend .item{display:flex;gap:8px;align-items:center}
-        .dot{width:14px;height:14px;border-radius:4px}
-        .dot.un{background:#ff9bcf}
-        .dot.piv{background:#8b5cf6} /* 新增 Pivot 圖例顏色 */
-        .dot.cmp{background:#ff8aa9}
-        .dot.swap{background:#ff5f8f}
-        .dot.done{background:#df75a8}
+        .wrap { 
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto; 
+        }
 
-        .footerControls{display:flex;gap:8px;align-items:center;margin-top:14px}
-        .status{margin-left:auto;color:var(--muted)}
-        .controls input[type=range]{width:160px}
+        /* --- 頂部標題區 --- */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .header .sub-title {
+            color: var(--muted);
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+        .btn-home {
+            display: inline-block;
+            text-decoration: none;
+            border: 1px solid var(--accent);
+            color: var(--text-main);
+            padding: 6px 16px;
+            border-radius: 999px;
+            font-size: 14px;
+            background: rgba(255,255,255,0.6);
+            transition: all 0.2s;
+        }
+        .btn-home:hover {
+            background: var(--accent);
+            color: white;
+        }
 
-        .badge{background:rgba(255,255,255,.45);padding:6px 10px;border-radius:999px;color:var(--muted);font-size:13px;text-decoration:none;display:inline-block;}
-        .badge:hover{background:rgba(255,255,255,.65);}
+        /* --- 區塊面板 (卡片) --- */
+        .section-card {
+            background: var(--panel);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(255, 136, 182, 0.1);
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            color: var(--text-main);
+        }
+        .section-title::before {
+            content: "";
+            display: inline-block;
+            width: 6px;
+            height: 20px;
+            background: var(--accent-2);
+            margin-right: 10px;
+            border-radius: 4px;
+        }
+
+        /* --- 一、操作原理 --- */
+        .desc-text {
+            line-height: 1.8;
+            color: #6d2040;
+            font-size: 15px;
+        }
+
+        /* --- 二、演算法偽代碼 --- */
+        pre {
+            background-color: var(--code-bg);
+            color: #ffe6f0;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: Consolas, monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 0;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .code-keyword { color: #ff85b3; font-weight: bold; }
+        .code-comment { color: #a84b7d; font-style: italic; }
+        .code-func { color: #ffb6d5; }
+
+        /* --- 三、時間 & 空間複雜度 --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 15px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid var(--card-border);
+            padding: 12px;
+            text-align: center;
+            color: #6d2040;
+        }
+        th {
+            background-color: rgba(255, 182, 213, 0.3);
+            font-weight: 600;
+        }
+        .highlight-green { color: #2e8b57; font-weight: bold; }
+        .highlight-red { color: #c0392b; font-weight: bold; }
+
+        /* --- 四、互動視覺化操作 --- */
+        .controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .controls-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.5);
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+        input[type=text] {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--card-border);
+            background: rgba(255,255,255,0.8);
+            color: var(--text-main);
+            min-width: 220px;
+            outline: none;
+        }
+
+        /* ✨ 自體流動漸層動畫按鈕 ✨ */
+        .btn-animated {
+            background: linear-gradient(270deg, #ff85b3, #ff529a, #ee5d8f, #ff85b3);
+            background-size: 300% 300%;
+            animation: gradientMove 3s ease infinite;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .btn-animated:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 82, 154, 0.4);
+        }
+        .btn-animated:active { transform: translateY(0); }
+        
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--accent);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-ghost:hover {
+            background: rgba(255, 133, 179, 0.15);
+        }
+
+        .controls input[type=range] { width: 100px; accent-color: var(--accent-2); }
+
+        /* 視覺化圖表區 */
+        #visualWrap {
+            height: 300px;
+            margin-top: 14px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.3);
+            padding: 16px;
+            border: 1px solid var(--card-border);
+        }
+        #visual {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            justify-content: center;
+        }
+        .bar {
+            flex: 1;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            background: linear-gradient(180deg, #ffb6d5, #ff85b3);
+            color: #fff;
+            border-radius: 4px 4px 0 0;
+            padding-bottom: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: height 0.2s, background 0.2s;
+            max-width: 50px;
+        }
+        
+        /* 快速排序專屬狀態顏色 */
+        .bar.compare { background: linear-gradient(180deg, #ffd86f, #ffb3a8); color: #4d1531; }
+        .bar.swap { background: linear-gradient(180deg, #ff8aa9, #ff5f8f); }
+        .bar.sorted { background: linear-gradient(180deg, #ffc4db, #f9a8c8); color: #4d1531; }
+        /* Pivot (基準值) 使用紫色凸顯 */
+        .bar.pivot { background: linear-gradient(180deg, #b088f9, #8b5cf6); color: white; box-shadow: 0 0 10px rgba(139, 92, 246, 0.5); z-index: 10;} 
+
+        /* 底部四個數據方塊 */
+        .stat-boxes {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        .stat-box {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .stat-num {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--accent-2);
+            margin-bottom: 4px;
+        }
+        .stat-label {
+            font-size: 13px;
+            color: var(--muted);
+        }
+        #info-bar {
+            background: rgba(255,255,255,0.5);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            text-align: center;
+            color: var(--text-main);
+        }
+        
+        /* 圖例區塊 */
+        .legend {
+            display: flex; gap: 16px; align-items: center; justify-content: center;
+            margin-top: 10px; color: var(--muted); font-size: 13px; font-weight: bold;
+        }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .dot { width: 12px; height: 12px; border-radius: 3px; }
+        .dot.piv { background: #8b5cf6; }
     </style>
 </head>
 <body>
     <div class="wrap">
-        <h1>⚪ 快速排序法</h1>
-        <div style="margin-top:8px">
-            <a href="index.html" class="badge">回首頁</a>
-            <a href="bubble_sort.html" class="badge" style="margin-left:8px">氣泡排序 Bubble Sort</a>
-            <a href="selection_sort.html" class="badge" style="margin-left:8px">選擇排序 Selection Sort</a>
-            <a href="insertion_sort.html" class="badge" style="margin-left:8px">插入排序 Insertion Sort</a>
+        
+        <div class="header">
+            <h1>⚡ 快速排序法 Quick Sort</h1>
+            <div class="sub-title">互動式視覺化教學 — 原理．步驟．複雜度</div>
+            <a href="index.html" class="btn-home">← 回到首頁</a>
         </div>
 
-        <div class="meta">Quick Sort — 視覺化步驟示範</div>
-
-        <div class="panel">
-            <div class="desc">
-                原理：快速排序採用「分治法」(Divide and Conquer)。每次會從數列中選定一個「基準值」(Pivot)，將比它小的元素移到它左邊，比它大的移到右邊（這個過程稱為分割 Partition）。接著，對左右兩個子數列分別重複此動作，直到所有子數列的長度為 1，即排序完成。
+        <div class="section-card">
+            <h2 class="section-title">一、操作原理</h2>
+            <div class="desc-text">
+                快速排序法（Quick Sort）同樣採用<strong>「分治法 (Divide and Conquer)」</strong>，是實務上最常用、平均速度最快的演算法之一。<br><br>
+                <strong>核心概念：</strong><br>
+                1. <strong>挑選基準 (Pivot)：</strong>從陣列中挑選一個元素作為基準值（此範例固定選擇當前區間的最後一個元素，圖表中以<span style="color:#8b5cf6; font-weight:bold;">紫色</span>標示）。<br>
+                2. <strong>分割 (Partition)：</strong>重新排列陣列，將所有比基準值小的元素移到基準值左邊，比基準值大的移到右邊。分割完成後，該基準值就成功「歸位」到最終正確的位置了。<br>
+                3. <strong>遞迴排序：</strong>對基準值左右兩邊的子陣列，重複執行上述步驟，直到子陣列長度為 1 或 0，排序即完成。
             </div>
+        </div>
 
-            <div class="stats">
-                <div class="stat">分割次數：<span id="pass">0</span></div>
-                <div class="stat">比較次數：<span id="comp">0</span></div>
-                <div class="stat">交換次數：<span id="swaps">0</span></div>
-                <div class="stat">狀態：<span id="status">暫停</span></div>
-            </div>
+        <div class="section-card">
+            <h2 class="section-title">二、演算法偽代碼</h2>
+<pre><code><span class="code-keyword">function</span> <span class="code-func">quickSort</span>(arr, low, high):
+  <span class="code-keyword">if</span> low < high:
+    <span class="code-comment">// 進行分割，並取得基準值歸位後的索引</span>
+    pivotIndex = partition(arr, low, high)
+    
+    <span class="code-comment">// 對基準值左右兩邊遞迴排序</span>
+    quickSort(arr, low, pivotIndex - 1)
+    quickSort(arr, pivotIndex + 1, high)
 
+<span class="code-keyword">function</span> <span class="code-func">partition</span>(arr, low, high):
+  pivot = arr[high]  <span class="code-comment">// 選擇最後一個元素為基準</span>
+  i = low - 1
+  <span class="code-keyword">for</span> j = low <span class="code-keyword">to</span> high - 1:
+    <span class="code-keyword">if</span> arr[j] < pivot:
+      i++
+      swap(arr[i], arr[j])
+  swap(arr[i + 1], arr[high])  <span class="code-comment">// 將基準值放到正確位置</span>
+  <span class="code-keyword">return</span> i + 1
+</code></pre>
+        </div>
+
+        <div class="section-card">
+            <h2 class="section-title">三、時間 & 空間複雜度</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>情況</th>
+                        <th>時間複雜度</th>
+                        <th>說明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>最佳情況 (Best)</td>
+                        <td class="highlight-green">O(n log n)</td>
+                        <td>每次挑選的 Pivot 剛好都能將陣列平分為兩半。</td>
+                    </tr>
+                    <tr>
+                        <td>平均情況 (Average)</td>
+                        <td class="highlight-green">O(n log n)</td>
+                        <td>多數情況下效能極佳，常數因子小，實際執行速度比多數排序都快。</td>
+                    </tr>
+                    <tr>
+                        <td>最壞情況 (Worst)</td>
+                        <td class="highlight-red">O(n²)</td>
+                        <td>陣列已經排序好，且每次都選最後一個元素當 Pivot 時發生。</td>
+                    </tr>
+                    <tr>
+                        <td>空間複雜度</td>
+                        <td class="highlight-green">O(log n)</td>
+                        <td>主要來自於遞迴呼叫時所需的堆疊 (Stack) 空間。最壞情況為 O(n)。</td>
+                    </tr>
+                    <tr>
+                        <td>穩定性</td>
+                        <td class="highlight-red">不穩定 ✗</td>
+                        <td>在進行跨距離交換時，可能會打亂相等元素的原始相對順序。</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section-card">
+            <h2 class="section-title">四、互動視覺化操作</h2>
+            
             <div class="controls">
-                <input id="input" type="text" placeholder="輸入數字，逗號分隔 e.g. 64,34,25,12,22,11,90" />
-                <button id="rand" class="ghost small">亂數陣列</button>
-                <select id="order" class="small">
-                    <option value="asc">遞增</option>
-                    <option value="desc">遞減</option>
-                </select>
-                <label class="small">速度 <input id="speed" type="range" min="20" max="800" value="220" /></label>
-                <div style="display:flex;gap:6px;align-items:center">
-                    <button id="start" class="small">開始</button>
-                    <button id="pause" class="small ghost">暫停</button>
-                    <button id="step" class="small ghost">單步</button>
-                    <button id="reset" class="small ghost">重置</button>
+                <div class="controls-group">
+                    <label style="font-size: 14px;">輸入數字：</label>
+                    <input id="input" type="text" value="64, 34, 25, 12, 22, 11, 90" />
+                    <button id="resetInput" class="btn-ghost">載入/重置</button>
+                    <button id="rand" class="btn-ghost" style="border-color: #ffb6d5;">隨機產生</button>
+                </div>
+                
+                <div class="controls-group" style="margin-left: auto;">
+                    <label style="font-size: 14px;">速度：</label>
+                    <input id="speed" type="range" min="20" max="800" value="220" dir="rtl" />
+                    
+                    <button id="start" class="btn-animated">▶ 開始排序</button>
+                    <button id="pause" class="btn-ghost">⏸ 暫停</button>
+                    <button id="step" class="btn-ghost" style="border-color: var(--accent-2); color: var(--accent-2);">⏭ 單步執行</button>
                 </div>
             </div>
 
-            <div id="visualWrap">
-                <div id="visual" aria-label="visualization"></div>
+            <div class="legend">
+                <div class="legend-item"><div class="dot" style="background: linear-gradient(180deg, #ffb6d5, #ff85b3);"></div> 未排序</div>
+                <div class="legend-item"><div class="dot piv"></div> 基準值 (Pivot)</div>
+                <div class="legend-item"><div class="dot" style="background: #ffd86f;"></div> 比較中</div>
+                <div class="legend-item"><div class="dot" style="background: #ff8aa9;"></div> 交換中</div>
+                <div class="legend-item"><div class="dot" style="background: #ffc4db;"></div> 已歸位/已排序</div>
             </div>
 
-            <div class="legend">
-                <div class="item"><span class="dot un"></span> 未排序</div>
-                <div class="item"><span class="dot piv"></span> 基準值 (Pivot)</div>
-                <div class="item"><span class="dot cmp"></span> 比較中</div>
-                <div class="item"><span class="dot swap"></span> 交換中</div>
-                <div class="item"><span class="dot done"></span> 已歸位/已排序</div>
+            <div id="visualWrap">
+                <div id="visual"></div>
+            </div>
+            
+            <div id="info-bar">狀態：等待開始...</div>
+
+            <div class="stat-boxes">
+                <div class="stat-box">
+                    <div class="stat-num" id="compBox">0</div>
+                    <div class="stat-label">比較次數</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" id="swapBox">0</div>
+                    <div class="stat-label">交換次數</div> 
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" id="passBox">0</div>
+                    <div class="stat-label">分割 (Partition) 次數</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" id="sizeBox">7</div>
+                    <div class="stat-label">陣列大小 (N)</div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         const inputEl = document.getElementById('input');
+        const resetInputBtn = document.getElementById('resetInput');
         const startBtn = document.getElementById('start');
         const pauseBtn = document.getElementById('pause');
         const stepBtn = document.getElementById('step');
-        const resetBtn = document.getElementById('reset');
         const randBtn = document.getElementById('rand');
         const visual = document.getElementById('visual');
-        const passEl = document.getElementById('pass');
-        const compEl = document.getElementById('comp');
-        const swapsEl = document.getElementById('swaps');
-        const statusEl = document.getElementById('status');
         const speedEl = document.getElementById('speed');
-        const orderEl = document.getElementById('order');
+        
+        const infoBar = document.getElementById('info-bar');
+        const compBox = document.getElementById('compBox');
+        const swapBox = document.getElementById('swapBox');
+        const passBox = document.getElementById('passBox');
+        const sizeBox = document.getElementById('sizeBox');
 
         let array = [];
         let working = false;
         let paused = true;
         let stepRequested = false;
-        let stats = {pass:0, comps:0, swaps:0};
+        let stats = {pass: 0, comps: 0, swaps: 0};
         
-        // 記錄 Pivot 索引與已排序(歸位)的索引，以便 Render 時上色
+        // 快速排序專用的狀態記錄
         let pivotIdx = -1;
         let sortedSet = new Set();
 
-        function randArray(n=10, max=100){
-            return Array.from({length:n}, ()=>Math.floor(Math.random()*max)+1);
+        function randArray(n = 10, max = 100){
+            return Array.from({length: n}, () => Math.floor(Math.random() * max) + 1);
         }
 
         function parseInput(text){
             if(!text) return [];
-            return text.split(',').map(s=>Number(s.trim())).filter(n=>!Number.isNaN(n));
+            return text.split(',').map(s => Number(s.trim())).filter(n => !Number.isNaN(n));
         }
 
         function render(){
-            visual.innerHTML='';
-            if(array.length===0) return;
-            const max = Math.max(...array.map(v=>Math.abs(v)),1);
-            for(let i=0;i<array.length;i++){
+            visual.innerHTML = '';
+            if(array.length === 0) return;
+            const max = Math.max(...array.map(v => Math.abs(v)), 1);
+            for(let i = 0; i < array.length; i++){
                 const val = array[i];
                 const el = document.createElement('div');
-                el.className='bar';
+                el.className = 'bar';
                 
                 // 套用特定狀態顏色
                 if(sortedSet.has(i)) el.classList.add('sorted');
                 if(i === pivotIdx) el.classList.add('pivot');
                 
-                el.style.height = (Math.abs(val)/max*100) + '%';
-                el.style.margin = '0 6px';
+                el.style.height = (Math.abs(val) / max * 100) + '%';
                 el.textContent = val;
                 el.dataset.index = i;
                 visual.appendChild(el);
             }
         }
 
-        function setStatus(s){ statusEl.textContent = s; }
-        function updateStats(){ passEl.textContent = stats.pass; compEl.textContent = stats.comps; swapsEl.textContent = stats.swaps; }
+        function setStatus(s){ infoBar.textContent = '狀態：' + s; }
+        function updateStats(){ 
+            passBox.textContent = stats.pass; 
+            compBox.textContent = stats.comps; 
+            swapBox.textContent = stats.swaps; 
+            sizeBox.textContent = array.length;
+        }
 
         function colorPair(i, j, mode){
             const bars = visual.children;
             // 移除 compare 和 swap，但不移除 sorted 和 pivot
-            for(let k=0;k<bars.length;k++) {
-                bars[k].classList.remove('compare','swap');
+            for(let k = 0; k < bars.length; k++) {
+                bars[k].classList.remove('compare', 'swap');
             }
-            if(mode==='compare'){
+            if(mode === 'compare'){
                 if(bars[i]) bars[i].classList.add('compare');
                 if(bars[j]) bars[j].classList.add('compare');
-            }else if(mode==='swap'){
+            } else if(mode === 'swap'){
                 if(bars[i]) bars[i].classList.add('swap');
                 if(bars[j]) bars[j].classList.add('swap');
             }
         }
 
-        function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+        function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
         async function doPause(){
             while(paused && !stepRequested){ await sleep(50); }
-            if(stepRequested){ stepRequested=false; paused=true; }
+            if(stepRequested){ stepRequested = false; paused = true; }
         }
 
         // --- 快速排序核心邏輯 ---
         async function partition(low, high) {
             stats.pass++; updateStats();
-            const asc = orderEl.value === 'asc';
+            
             let pivotValue = array[high];
-            pivotIdx = high; 
-            render(); // 顯示當前 Pivot
+            pivotIdx = high; // 設定當前 Pivot
+            render(); 
 
             let i = low - 1;
 
@@ -208,18 +540,18 @@
                 colorPair(j, high, 'compare');
                 await sleep(Number(speedEl.value));
 
-                if (asc ? array[j] < pivotValue : array[j] > pivotValue) {
+                if (array[j] < pivotValue) {
                     i++;
                     if (i !== j) {
                         colorPair(i, j, 'swap');
-                        await sleep(Number(speedEl.value)/2);
+                        await sleep(Number(speedEl.value) / 2);
                         
-                        let t = array[i]; array[i]=array[j]; array[j]=t;
+                        let t = array[i]; array[i] = array[j]; array[j] = t;
                         stats.swaps++; updateStats();
                         
                         render();
                         colorPair(i, j, 'swap');
-                        await sleep(Number(speedEl.value)/2);
+                        await sleep(Number(speedEl.value) / 2);
                     }
                 }
                 render(); 
@@ -231,19 +563,19 @@
             i++;
             if (i !== high) {
                 colorPair(i, high, 'swap');
-                await sleep(Number(speedEl.value)/2);
+                await sleep(Number(speedEl.value) / 2);
                 
-                let t = array[i]; array[i]=array[high]; array[high]=t;
+                let t = array[i]; array[i] = array[high]; array[high] = t;
                 stats.swaps++; updateStats();
                 
                 pivotIdx = i; // Pivot 移動到新位置
                 render();
                 colorPair(i, high, 'swap');
-                await sleep(Number(speedEl.value)/2);
+                await sleep(Number(speedEl.value) / 2);
             }
             
-            pivotIdx = -1;
-            sortedSet.add(i); // Pivot 確定歸位
+            pivotIdx = -1; // 結束 Pivot 標記
+            sortedSet.add(i); // Pivot 確定歸位，標記為已排序
             render();
             return i;
         }
@@ -262,43 +594,59 @@
             }
         }
 
-        async function quickSortControlled(){
-            working = true; paused = false; setStatus('執行中');
-            stats = {pass:0, comps:0, swaps:0}; updateStats();
+        // --- 按鈕事件 ---
+        resetInputBtn.addEventListener('click', () => {
+            working = false; paused = true; stepRequested = false;
+            const parsed = parseInput(inputEl.value);
+            if(parsed.length > 0) array = parsed.slice();
+            stats = {pass: 0, comps: 0, swaps: 0}; 
             sortedSet.clear(); pivotIdx = -1;
+            render(); updateStats(); setStatus('等待開始...');
+        });
+
+        startBtn.addEventListener('click', async () => {
+            if(working){ paused = false; setStatus('繼續執行中'); return; }
+            resetInputBtn.click(); // 確保讀取最新陣列
+            
+            working = true; paused = false; setStatus('執行中，紫色的柱子為當前的基準值 (Pivot)');
+            stats = {pass: 0, comps: 0, swaps: 0}; updateStats();
+            sortedSet.clear(); pivotIdx = -1;
+            render();
             
             await quickSortMain(0, array.length - 1);
             
-            if (!working) return; // 中途重置
-
-            // 確保所有元素皆標記為已排序
-            for(let i=0; i<array.length; i++) sortedSet.add(i);
-            pivotIdx = -1;
-            render();
-            setStatus('完成'); working=false; paused=true; updateStats();
-        }
-
-        // --- 事件綁定 ---
-        startBtn.addEventListener('click', async ()=>{
-            if(working){ paused=false; setStatus('執行中'); return; }
-            const parsed = parseInput(inputEl.value);
-            if(parsed.length>0) array = parsed.slice();
-            if(array.length===0){ array = randArray(10,100); inputEl.value = array.join(','); }
-            sortedSet.clear(); pivotIdx = -1;
-            render();
-            quickSortControlled();
+            if(working) {
+                // 確保所有元素皆標記為已排序
+                for(let i = 0; i < array.length; i++) sortedSet.add(i);
+                pivotIdx = -1;
+                render();
+                setStatus('✅ 排序完成！'); 
+                working = false; paused = true; updateStats();
+            }
         });
 
-        pauseBtn.addEventListener('click', ()=>{ if(!working) return; paused=true; setStatus('暫停'); });
+        pauseBtn.addEventListener('click', () => { 
+            if(!working) return; 
+            paused = true; setStatus('已暫停'); 
+        });
 
-        stepBtn.addEventListener('click', ()=>{ if(!working){ startBtn.click(); paused=true; } stepRequested=true; paused=false; setStatus('單步'); });
+        stepBtn.addEventListener('click', () => { 
+            if(!working){ startBtn.click(); paused = true; } 
+            stepRequested = true; paused = false; setStatus('單步執行中...'); 
+        });
 
-        resetBtn.addEventListener('click', ()=>{ working=false; paused=true; stepRequested=false; array=[]; inputEl.value=''; visual.innerHTML=''; stats={pass:0,comps:0,swaps:0}; sortedSet.clear(); pivotIdx = -1; updateStats(); setStatus('暫停'); });
+        randBtn.addEventListener('click', () => { 
+            working = false; paused = true; stepRequested = false;
+            const a = randArray(10, 100); 
+            array = a; 
+            inputEl.value = a.join(', '); 
+            stats = {pass: 0, comps: 0, swaps: 0}; 
+            sortedSet.clear(); pivotIdx = -1;
+            render(); updateStats(); setStatus('已產生隨機陣列，等待開始...'); 
+        });
 
-        randBtn.addEventListener('click', ()=>{ const a = randArray(10,100); array=a; inputEl.value=a.join(','); sortedSet.clear(); pivotIdx = -1; render(); stats={pass:0,comps:0,swaps:0}; updateStats(); setStatus('暫停'); });
-
-        // initial demo
-        array = [64,34,25,12,22,11,90]; inputEl.value = array.join(','); render(); updateStats(); setStatus('暫停');
+        // 初始畫面
+        resetInputBtn.click();
     </script>
 </body>
 </html>

@@ -3,223 +3,589 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>插入排序 Insertion Sort — 示範教學</title>
+    <title>插入排序 Insertion Sort — 視覺化教學</title>
     <style>
-        :root{--bg:#fff0f6;--panel:#ffd6e8;--muted:#7e3b5d;--accent:#ff8fbf;--accent-2:#ff6aa3;--ok:#ffb6d5;--danger:#dd426e;--card:#ffe1eb}
-        *{box-sizing:border-box}
-        body{margin:0;font-family:Inter,Segoe UI,Arial;background:linear-gradient(180deg,var(--bg),#ffd6e8);color:#4d1531;padding:28px}
-        .wrap{max-width:980px;margin:0 auto}
-        h1{display:flex;align-items:center;gap:10px;font-weight:600}
-        .meta{color:var(--muted);margin-top:6px}
-        .panel{background:var(--panel);border-radius:12px;padding:18px;margin-top:16px;box-shadow:0 8px 28px rgba(255,138,182,0.08)}
-        .desc{background:rgba(255,255,255,.45);padding:12px;border-radius:8px;color:var(--muted)}
-        .stats{display:flex;gap:10px;margin:12px 0;align-items:center}
-        .stat{padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.55);font-size:13px;color:#4d1531}
-        .controls{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
-        input[type=text]{padding:8px;border-radius:8px;border:none;background:rgba(255,255,255,.6);color:#4d1531;min-width:260px}
-        button{background:linear-gradient(180deg,var(--accent),var(--accent-2));border:none;color:white;padding:10px 14px;border-radius:999px;cursor:pointer;transition:transform .12s ease,filter .12s ease,box-shadow .12s ease}
-        button:hover{transform:translateY(-2px);filter:brightness(1.04);box-shadow:0 6px 20px rgba(255,136,183,0.12)}
-        button:active{transform:translateY(0);filter:brightness(.95)}
-        button:focus{outline:3px solid rgba(255,136,183,0.18);outline-offset:2px}
-        button.ghost{background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,.35)}
-        button.ghost:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.5)}
-        button.warn{background:linear-gradient(180deg,var(--accent-2),#ee5d8f);color:white}
-        .small{padding:8px 10px;font-size:13px}
-        #visualWrap{height:320px;margin-top:14px;display:flex;align-items:center;justify-content:center}
-        #visual{width:100%;height:100%;display:flex;align-items:flex-end;gap:10px;padding:18px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.35),transparent)}
-        .bar{flex:1;display:flex;align-items:flex-end;justify-content:center;background:linear-gradient(180deg,#ffc7df,#ff9bcf);color:#4d1531;border-radius:6px 6px 4px 4px;padding:6px 4px;font-weight:600}
-        .bar.compare{background:linear-gradient(180deg,#ffd86f,#ffb3a8)}
-        .bar.swap{background:linear-gradient(180deg,#ff8aa9,#ff5f8f)}
-        .bar.sorted{background:linear-gradient(180deg,#ffd4e5,#ffb0ca)}
-        .legend{display:flex;gap:12px;align-items:center;margin-top:10px;color:var(--muted)}
-        .legend .item{display:flex;gap:8px;align-items:center}
-        .dot{width:14px;height:14px;border-radius:4px}
-        .dot.un{background:#ff9bcf}
-        .dot.cmp{background:#ff8aa9}
-        .dot.swap{background:#ff5f8f}
-        .dot.done{background:#df75a8}
-        .footerControls{display:flex;gap:8px;align-items:center;margin-top:14px}
-        .status{margin-left:auto;color:var(--muted)}
-        .controls input[type=range]{width:160px}
-        .badge{background:rgba(255,255,255,.45);padding:6px 10px;border-radius:999px;color:var(--muted);font-size:13px}
+        :root {
+            --bg: #fff0f5;         
+            --panel: rgba(255, 255, 255, 0.55); 
+            --muted: #a84b7d;      
+            --accent: #ff85b3;     
+            --accent-2: #ff529a;   
+            --text-main: #8a1c4a;  
+            --card-border: rgba(255, 182, 213, 0.6);
+            --code-bg: #4d1531;
+        }
+        * { box-sizing: border-box; }
+        
+        body {
+            margin: 0;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg) 0%, #ffc4db 100%);
+            color: var(--text-main);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .wrap { 
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto; 
+        }
+
+        /* --- 頂部標題區 --- */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .header .sub-title {
+            color: var(--muted);
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+        .btn-home {
+            display: inline-block;
+            text-decoration: none;
+            border: 1px solid var(--accent);
+            color: var(--text-main);
+            padding: 6px 16px;
+            border-radius: 999px;
+            font-size: 14px;
+            background: rgba(255,255,255,0.6);
+            transition: all 0.2s;
+        }
+        .btn-home:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* --- 區塊面板 (卡片) --- */
+        .section-card {
+            background: var(--panel);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(255, 136, 182, 0.1);
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            color: var(--text-main);
+        }
+        .section-title::before {
+            content: "";
+            display: inline-block;
+            width: 6px;
+            height: 20px;
+            background: var(--accent-2);
+            margin-right: 10px;
+            border-radius: 4px;
+        }
+
+        /* --- 一、操作原理 --- */
+        .desc-text {
+            line-height: 1.8;
+            color: #6d2040;
+            font-size: 15px;
+        }
+
+        /* --- 二、演算法偽代碼 --- */
+        pre {
+            background-color: var(--code-bg);
+            color: #ffe6f0;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: Consolas, monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 0;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .code-keyword { color: #ff85b3; font-weight: bold; }
+        .code-comment { color: #a84b7d; font-style: italic; }
+        .code-func { color: #ffb6d5; }
+
+        /* --- 三、時間 & 空間複雜度 --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 15px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid var(--card-border);
+            padding: 12px;
+            text-align: center;
+            color: #6d2040;
+        }
+        th {
+            background-color: rgba(255, 182, 213, 0.3);
+            font-weight: 600;
+        }
+        .highlight-green { color: #2e8b57; font-weight: bold; }
+        .highlight-red { color: #c0392b; font-weight: bold; }
+
+        /* --- 四、互動視覺化操作 --- */
+        .controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .controls-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.5);
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+        input[type=text] {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--card-border);
+            background: rgba(255,255,255,0.8);
+            color: var(--text-main);
+            min-width: 220px;
+            outline: none;
+        }
+
+        /* ✨ 自體流動漸層動畫按鈕 ✨ */
+        .btn-animated {
+            background: linear-gradient(270deg, #ff85b3, #ff529a, #ee5d8f, #ff85b3);
+            background-size: 300% 300%;
+            animation: gradientMove 3s ease infinite;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .btn-animated:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 82, 154, 0.4);
+        }
+        .btn-animated:active { transform: translateY(0); }
+        
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--accent);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-ghost:hover {
+            background: rgba(255, 133, 179, 0.15);
+        }
+
+        .controls input[type=range] { width: 100px; accent-color: var(--accent-2); }
+
+        /* 圖例區塊 */
+        .legend {
+            display: flex; gap: 16px; align-items: center; justify-content: center;
+            margin-top: 10px; color: var(--muted); font-size: 13px; font-weight: bold;
+        }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .dot { width: 12px; height: 12px; border-radius: 3px; }
+
+        /* 視覺化圖表區 */
+        #visualWrap {
+            height: 300px;
+            margin-top: 14px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.3);
+            padding: 16px;
+            border: 1px solid var(--card-border);
+        }
+        #visual {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            justify-content: center;
+        }
+        .bar {
+            flex: 1;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            background: linear-gradient(180deg, #ffb6d5, #ff85b3);
+            color: #fff;
+            border-radius: 4px 4px 0 0;
+            padding-bottom: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: height 0.2s, background 0.2s;
+            max-width: 50px;
+        }
+        /* 插入排序的顏色狀態 */
+        .bar.compare { background: linear-gradient(180deg, #ffd86f, #ffb3a8); color: #4d1531; }
+        .bar.swap { background: linear-gradient(180deg, #ff8aa9, #ff5f8f); }
+        .bar.sorted { background: linear-gradient(180deg, #ffc4db, #f9a8c8); color: #4d1531; }
+
+        /* 底部四個數據方塊 */
+        .stat-boxes {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        .stat-box {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .stat-num {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--accent-2);
+            margin-bottom: 4px;
+        }
+        .stat-label {
+            font-size: 13px;
+            color: var(--muted);
+        }
+        #info-bar {
+            background: rgba(255,255,255,0.5);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            text-align: center;
+            color: var(--text-main);
+        }
     </style>
 </head>
 <body>
     <div class="wrap">
-        <h1>↪️ 插入排序法</h1>
-        <div style="margin-top:8px">
-            <a href="index.html" class="badge">回首頁</a>
-            <a href="bubble_sort.html" class="badge" style="margin-left:8px">氣泡排序 Bubble Sort</a>
-            <a href="selection_sort.html" class="badge" style="margin-left:8px">選擇排序 Selection Sort</a>
+        
+        <div class="header">
+            <h1>↪️ 插入排序法 Insertion Sort</h1>
+            <div class="sub-title">互動式視覺化教學 — 原理．步驟．複雜度</div>
+            <a href="index.html" class="btn-home">← 回到首頁</a>
         </div>
 
-        <div class="meta">Insertion Sort — 逐步把每個元素插入到已排序區域</div>
-
-        <div class="panel">
-            <div class="desc">
-                原理：插入排序會將陣列分成已排序與未排序兩部分，從未排序區取出第一個元素（key），向左比較並將較大的元素依序右移，直到找到合適位置把 key 插入。重複直到整個陣列排序完成。
+        <div class="section-card">
+            <h2 class="section-title">一、操作原理</h2>
+            <div class="desc-text">
+                插入排序法（Insertion Sort）的運作方式就像是我們在打撲克牌時「理牌」的過程。<br><br>
+                <strong>核心概念：</strong>將陣列分成「已排序」與「未排序」兩個區域。初始時，將第一個元素視為已排序。接著從未排序區逐一取出元素（Key），由右至左與已排序區的元素進行比較。若找到比 Key 大的元素，則將該元素往右平移。直到找到不大於 Key 的元素（或到達最左端）時，將 Key 插入該位置。
             </div>
+        </div>
 
-            <div class="stats">
-                <div class="stat">第 <span id="pass">0</span> 輪 / 共 <span id="totalPass">0</span> 輪</div>
-                <div class="stat">比較次數：<span id="comp">0</span></div>
-                <div class="stat">移動次數：<span id="swaps">0</span></div>
-                <div class="stat">狀態：<span id="status">暫停</span></div>
-            </div>
+        <div class="section-card">
+            <h2 class="section-title">二、演算法偽代碼</h2>
+<pre><code><span class="code-keyword">function</span> <span class="code-func">insertionSort</span>(arr):
+  n = arr.length
+  <span class="code-keyword">for</span> i = 1 <span class="code-keyword">to</span> n-1:
+    key = arr[i]
+    j = i - 1
+    <span class="code-comment">// 在已排序區間由右至左尋找插入位置</span>
+    <span class="code-keyword">while</span> j >= 0 <span class="code-keyword">and</span> arr[j] > key:
+      arr[j+1] = arr[j]  <span class="code-comment">// 將較大的元素向右平移一格</span>
+      j = j - 1
+    arr[j+1] = key       <span class="code-comment">// 將 key 插入到正確位置</span>
+</code></pre>
+        </div>
 
+        <div class="section-card">
+            <h2 class="section-title">三、時間 & 空間複雜度</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>情況</th>
+                        <th>時間複雜度</th>
+                        <th>說明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>最佳情況 (Best)</td>
+                        <td class="highlight-green">O(n)</td>
+                        <td>陣列已是排序狀態，每次只需比較 1 次，無須平移。</td>
+                    </tr>
+                    <tr>
+                        <td>平均情況 (Average)</td>
+                        <td>O(n²)</td>
+                        <td>元素隨機分布，平均需要比較與移動一半的已排序元素。</td>
+                    </tr>
+                    <tr>
+                        <td>最壞情況 (Worst)</td>
+                        <td class="highlight-red">O(n²)</td>
+                        <td>陣列完全逆序，每次都需要比較並移動到最前端。</td>
+                    </tr>
+                    <tr>
+                        <td>空間複雜度</td>
+                        <td class="highlight-green">O(1)</td>
+                        <td>原地排序，僅需常數的額外空間儲存 key。</td>
+                    </tr>
+                    <tr>
+                        <td>穩定性</td>
+                        <td>穩定 ✓</td>
+                        <td>相等元素不會交錯，不改變原始相對順序。</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section-card">
+            <h2 class="section-title">四、互動視覺化操作</h2>
+            
             <div class="controls">
-                <input id="input" type="text" placeholder="輸入數字，逗號分隔 e.g. 64,34,25,12,22,11,90" />
-                <button id="rand" class="ghost small">亂數陣列</button>
-                <select id="order" class="small">
-                    <option value="asc">遞增</option>
-                    <option value="desc">遞減</option>
-                </select>
-                <label class="small">速度 <input id="speed" type="range" min="20" max="800" value="220" /></label>
-                <div style="display:flex;gap:6px;align-items:center">
-                    <button id="start" class="small">開始</button>
-                    <button id="pause" class="small ghost">暫停</button>
-                    <button id="step" class="small ghost">單步</button>
-                    <button id="reset" class="small ghost">重置</button>
+                <div class="controls-group">
+                    <label style="font-size: 14px;">輸入數字：</label>
+                    <input id="input" type="text" value="64, 34, 25, 12, 22, 11, 90" />
+                    <button id="resetInput" class="btn-ghost">載入/重置</button>
+                    <button id="rand" class="btn-ghost" style="border-color: #ffb6d5;">隨機產生</button>
+                </div>
+                
+                <div class="controls-group" style="margin-left: auto;">
+                    <label style="font-size: 14px;">速度：</label>
+                    <input id="speed" type="range" min="20" max="800" value="220" dir="rtl" />
+                    
+                    <button id="start" class="btn-animated">▶ 開始排序</button>
+                    <button id="pause" class="btn-ghost">⏸ 暫停</button>
+                    <button id="step" class="btn-ghost" style="border-color: var(--accent-2); color: var(--accent-2);">⏭ 單步執行</button>
                 </div>
             </div>
 
-            <div id="visualWrap">
-                <div id="visual" aria-label="visualization"></div>
+            <div class="legend">
+                <div class="legend-item"><div class="dot" style="background: linear-gradient(180deg, #ffb6d5, #ff85b3);"></div> 未排序</div>
+                <div class="legend-item"><div class="dot" style="background: #ffd86f;"></div> 比較中</div>
+                <div class="legend-item"><div class="dot" style="background: #ff8aa9;"></div> 移動中</div>
+                <div class="legend-item"><div class="dot" style="background: #ffc4db;"></div> 已排序</div>
             </div>
 
-            <div class="legend">
-                <div class="item"><span class="dot un"></span> 未排序</div>
-                <div class="item"><span class="dot cmp"></span> 比較中</div>
-                <div class="item"><span class="dot swap"></span> 移動中</div>
-                <div class="item"><span class="dot done"></span> 已排序</div>
+            <div id="visualWrap">
+                <div id="visual"></div>
+            </div>
+            
+            <div id="info-bar">狀態：等待開始...</div>
+
+            <div class="stat-boxes">
+                <div class="stat-box">
+                    <div class="stat-num" id="compBox">0</div>
+                    <div class="stat-label">比較次數</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" id="swapBox">0</div>
+                    <div class="stat-label">移動次數</div> 
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" id="passBox">0</div>
+                    <div class="stat-label">當前輪數</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num" id="sizeBox">7</div>
+                    <div class="stat-label">陣列大小 (N)</div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         const inputEl = document.getElementById('input');
+        const resetInputBtn = document.getElementById('resetInput');
         const startBtn = document.getElementById('start');
         const pauseBtn = document.getElementById('pause');
         const stepBtn = document.getElementById('step');
-        const resetBtn = document.getElementById('reset');
         const randBtn = document.getElementById('rand');
         const visual = document.getElementById('visual');
-        const passEl = document.getElementById('pass');
-        const totalPassEl = document.getElementById('totalPass');
-        const compEl = document.getElementById('comp');
-        const swapsEl = document.getElementById('swaps');
-        const statusEl = document.getElementById('status');
         const speedEl = document.getElementById('speed');
-        const orderEl = document.getElementById('order');
+        
+        // 狀態與數據綁定
+        const infoBar = document.getElementById('info-bar');
+        const compBox = document.getElementById('compBox');
+        const swapBox = document.getElementById('swapBox');
+        const passBox = document.getElementById('passBox');
+        const sizeBox = document.getElementById('sizeBox');
 
         let array = [];
         let working = false;
         let paused = true;
         let stepRequested = false;
-        let stats = {pass:0, comps:0, swaps:0};
+        let stats = {pass: 0, comps: 0, swaps: 0};
 
-        function randArray(n=7, max=100){
-            return Array.from({length:n}, ()=>Math.floor(Math.random()*max)+1);
+        function randArray(n = 7, max = 100){
+            return Array.from({length: n}, () => Math.floor(Math.random() * max) + 1);
         }
 
         function parseInput(text){
             if(!text) return [];
-            return text.split(',').map(s=>Number(s.trim())).filter(n=>!Number.isNaN(n));
+            return text.split(',').map(s => Number(s.trim())).filter(n => !Number.isNaN(n));
         }
 
         function render(){
-            visual.innerHTML='';
-            if(array.length===0) return;
-            const max = Math.max(...array.map(v=>Math.abs(v)),1);
-            for(let i=0;i<array.length;i++){
+            visual.innerHTML = '';
+            if(array.length === 0) return;
+            const max = Math.max(...array.map(v => Math.abs(v)), 1);
+            for(let i = 0; i < array.length; i++){
                 const val = array[i];
                 const el = document.createElement('div');
-                el.className='bar';
-                el.style.height = (Math.abs(val)/max*100) + '%';
-                el.style.margin = '0 6px';
+                el.className = 'bar';
+                el.style.height = (Math.abs(val) / max * 100) + '%';
                 el.textContent = val;
                 el.dataset.index = i;
                 visual.appendChild(el);
             }
         }
 
-        function setStatus(s){ statusEl.textContent = s; }
-        function updateStats(){ passEl.textContent = stats.pass; totalPassEl.textContent = Math.max(0,array.length-1); compEl.textContent = stats.comps; swapsEl.textContent = stats.swaps; }
+        function setStatus(s){ infoBar.textContent = '狀態：' + s; }
+        function updateStats(){ 
+            passBox.textContent = stats.pass; 
+            compBox.textContent = stats.comps; 
+            swapBox.textContent = stats.swaps; 
+            sizeBox.textContent = array.length;
+        }
 
+        // 插入排序專屬的上色邏輯 (保留左側已排序區的底色)
         function colorPair(i, j, mode){
             const bars = visual.children;
-            for(let k=0;k<bars.length;k++) bars[k].classList.remove('compare','swap','sorted');
-            if(mode==='compare'){
-                if(bars[i]) bars[i].classList.add('compare');
-                if(bars[j]) bars[j].classList.add('compare');
-            }else if(mode==='swap'){
-                if(bars[i]) bars[i].classList.add('swap');
-                if(bars[j]) bars[j].classList.add('swap');
-            }else if(mode==='sorted'){
-                for(let s=0;s<=stats.pass;s++){ if(bars[s]) bars[s].classList.add('sorted'); }
+            for(let k = 0; k < bars.length; k++) {
+                bars[k].classList.remove('compare', 'swap', 'sorted');
+                // 左半部屬於已排序區域，給予 sorted 顏色
+                if (k <= stats.pass && mode !== 'finish') {
+                    bars[k].classList.add('sorted');
+                }
+            }
+            
+            if(mode === 'compare'){
+                if(bars[i]) { bars[i].classList.remove('sorted'); bars[i].classList.add('compare'); }
+                if(bars[j]) { bars[j].classList.remove('sorted'); bars[j].classList.add('compare'); }
+            } else if(mode === 'swap'){
+                if(bars[i]) { bars[i].classList.remove('sorted'); bars[i].classList.add('swap'); }
+                if(bars[j]) { bars[j].classList.remove('sorted'); bars[j].classList.add('swap'); }
+            } else if (mode === 'finish') {
+                for(let k = 0; k < bars.length; k++) bars[k].classList.add('sorted');
             }
         }
 
-        function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+        function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
         async function doPause(){
             while(paused && !stepRequested){ await sleep(50); }
-            if(stepRequested){ stepRequested=false; paused=true; }
+            if(stepRequested){ stepRequested = false; paused = true; }
         }
 
         async function insertionSortControlled(){
-            working = true; paused = false; setStatus('執行中');
-            stats = {pass:0, comps:0, swaps:0}; updateStats();
-            const asc = orderEl.value==='asc';
+            working = true; paused = false; setStatus('執行中，按暫停或單步控制');
+            stats = {pass: 0, comps: 0, swaps: 0}; updateStats();
             const n = array.length;
-            for(let i=1;i<n;i++){
+            
+            // 初始狀態：索引 0 視為已排序
+            colorPair(null, null, 'init');
+
+            for(let i = 1; i < n; i++){
                 stats.pass = i; updateStats();
-                let key = array[i];
-                let j = i-1;
-                while(j>=0){
+                let j = i;
+                
+                while(j > 0){
                     if(paused) await doPause();
                     stats.comps++; updateStats();
-                    colorPair(j, j+1, 'compare');
+                    
+                    colorPair(j - 1, j, 'compare');
                     await sleep(Number(speedEl.value));
-                    if(asc ? array[j] > key : array[j] < key){
-                        colorPair(j, j+1, 'swap');
-                        await sleep(Number(speedEl.value)/2);
-                        array[j+1] = array[j];
+                    
+                    if(array[j - 1] > array[j]){
+                        colorPair(j - 1, j, 'swap');
+                        await sleep(Number(speedEl.value) / 2);
+                        
+                        let temp = array[j];
+                        array[j] = array[j - 1];
+                        array[j - 1] = temp;
+                        
                         stats.swaps++; updateStats();
-                        render();
-                        await sleep(Number(speedEl.value)/2);
+                        render(); 
+                        
+                        colorPair(j - 1, j, 'swap'); 
+                        await sleep(Number(speedEl.value) / 2);
                         j--;
-                    }else{
+                    } else {
                         break;
                     }
                 }
-                array[j+1] = key;
-                render();
-                colorPair(null,null,'sorted');
+                colorPair(null, null, 'update_sorted');
             }
-            const bars = visual.children;
-            for(let k=0;k<bars.length;k++) bars[k].classList.add('sorted');
-            setStatus('完成'); working=false; paused=true; updateStats();
+            
+            colorPair(null, null, 'finish');
+            setStatus('✅ 排序完成！'); 
+            working = false; paused = true; updateStats();
         }
 
-        startBtn.addEventListener('click', async ()=>{
-            if(working){ paused=false; setStatus('執行中'); return; }
+        // --- 按鈕事件 ---
+        resetInputBtn.addEventListener('click', () => {
+            working = false; paused = true; stepRequested = false;
             const parsed = parseInput(inputEl.value);
-            if(parsed.length>0) array = parsed.slice();
-            if(array.length===0){ array = randArray(7,100); inputEl.value = array.join(','); }
-            render();
+            if(parsed.length > 0) array = parsed.slice();
+            stats = {pass: 0, comps: 0, swaps: 0}; 
+            render(); updateStats(); setStatus('等待開始...');
+        });
+
+        startBtn.addEventListener('click', async () => {
+            if(working){ paused = false; setStatus('繼續執行中'); return; }
+            resetInputBtn.click(); // 確保讀取最新陣列
             insertionSortControlled();
         });
 
-        pauseBtn.addEventListener('click', ()=>{ if(!working) return; paused=true; setStatus('暫停'); });
+        pauseBtn.addEventListener('click', () => { 
+            if(!working) return; 
+            paused = true; setStatus('已暫停'); 
+        });
 
-        stepBtn.addEventListener('click', ()=>{ if(!working){ startBtn.click(); paused=true; } stepRequested=true; paused=false; setStatus('單步'); });
+        stepBtn.addEventListener('click', () => { 
+            if(!working){ startBtn.click(); paused = true; } 
+            stepRequested = true; paused = false; setStatus('單步執行中...'); 
+        });
 
-        resetBtn.addEventListener('click', ()=>{ working=false; paused=true; stepRequested=false; array=[]; inputEl.value=''; visual.innerHTML=''; stats={pass:0,comps:0,swaps:0}; updateStats(); setStatus('暫停'); });
+        randBtn.addEventListener('click', () => { 
+            working = false; paused = true; stepRequested = false;
+            const a = randArray(7, 100); 
+            array = a; 
+            inputEl.value = a.join(', '); 
+            stats = {pass: 0, comps: 0, swaps: 0}; 
+            render(); updateStats(); setStatus('已產生隨機陣列，等待開始...'); 
+        });
 
-        randBtn.addEventListener('click', ()=>{ const a = randArray(7,100); array=a; inputEl.value=a.join(','); render(); stats={pass:0,comps:0,swaps:0}; updateStats(); setStatus('暫停'); });
-
-        array = [64,34,25,12,22,11,90]; inputEl.value = array.join(','); render(); updateStats(); setStatus('暫停');
+        // 初始畫面
+        resetInputBtn.click();
     </script>
 </body>
 </html>
