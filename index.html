@@ -1,63 +1,116 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width,initial-scale=1" />
-	<title>氣泡排序 Bubble Sort — 視覺化步驟示範</title>
-	<style>
-		:root{
-			--bg:#ffe9f4;--panel:#ffd6e8;--muted:#7e3b5d;--accent:#ff9bcf;--accent-2:#f66fa5;
-			--ok:#df75a8;--danger:#dd426e;--card:#ffe1eb
-		}
-		*{box-sizing:border-box}
-		body{margin:0;font-family:Inter,Segoe UI,Arial;background:linear-gradient(180deg,var(--bg),#ffd6e8);color:#4d1531;padding:28px}
-		.wrap{max-width:980px;margin:0 auto}
-		h1{display:flex;align-items:center;gap:10px;font-weight:600}
-		.meta{color:var(--muted);margin-top:6px}
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>排序演示 — 全粉紅主題</title>
+    <style>
+        :root {
+            /* 調整為更和諧、無分裂感的全粉紅色階 */
+            --bg: #fff0f5;         /* 極淺的櫻花粉底色 */
+            --panel: rgba(255, 214, 232, 0.6); /* 面板半透粉色 */
+            --muted: #a84b7d;      /* 柔和的深粉字體 (副標題) */
+            --accent: #ff85b3;     /* 亮粉色 (Hover漸層上) */
+            --accent-2: #ff529a;   /* 較深的亮粉色 (Hover漸層下) */
+            --text-main: #8a1c4a;  /* 主字體深玫瑰粉 (取代原本偏暗紫色的字) */
+        }
+        * { box-sizing: border-box; }
+        
+        body {
+            margin: 0;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg) 0%, #ffc4db 100%);
+            color: var(--text-main);
+            padding: 28px;
+            min-height: 100vh; /* 確保漸層填滿整個畫面 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .wrap { 
+            width: 100%;
+            max-width: 600px; /* 首頁選單不需要太寬 */
+            margin: 40px auto 0; 
+        }
+        
+        h1 { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            gap: 10px; 
+            font-weight: 600; 
+            margin-bottom: 5px;
+        }
+        
+        .meta { 
+            color: var(--muted); 
+            margin-top: 6px; 
+            text-align: center;
+            font-size: 15px;
+        }
 
-		.panel{background:var(--panel);border-radius:12px;padding:18px;margin-top:16px;box-shadow:0 6px 18px rgba(255,155,195,0.45)}
-		.desc{background:rgba(255,255,255,.45);padding:12px;border-radius:8px;color:#7e3b5d}
+        /* 首頁專屬面板設計：毛玻璃質感 */
+        .panel {
+            background: var(--panel);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            padding: 40px 20px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(255, 136, 182, 0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            align-items: center;
+        }
 
-		.stats{display:flex;gap:10px;margin:12px 0;align-items:center}
-		.stat{padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.55);font-size:13px;color:#4d1531}
-		.controls{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
-		input[type=text]{padding:8px;border-radius:8px;border:none;background:rgba(255,255,255,.6);color:#4d1531;min-width:260px}
-		button{background:linear-gradient(180deg,var(--accent),#ff7fab);border:none;color:#3c0f24;padding:10px 14px;border-radius:999px;cursor:pointer}
-		button.ghost{background:rgba(255,255,255,.35);color:#7e3b5d;border:1px solid rgba(255,255,255,.65)}
-		button.warn{background:linear-gradient(180deg,var(--accent-2),#ee5d8f);color:#3c0f24}
-		.small{padding:8px 10px;font-size:13px}
-		#visualWrap{height:320px;margin-top:14px;display:flex;align-items:center;justify-content:center}
-		#visual{width:100%;height:100%;display:flex;align-items:flex-end;gap:10px;padding:18px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.35),transparent)}
-		.bar{flex:1;display:flex;align-items:flex-end;justify-content:center;background:linear-gradient(180deg,#ffb3cf,#ff8cae);color:#4d1531;border-radius:6px 6px 4px 4px;padding:6px 4px;font-weight:600}
-		.bar.compare{background:linear-gradient(180deg,#ffc7df,#ff93bd)}
-		.bar.swap{background:linear-gradient(180deg,#ff8aa9,#ff5f8f)}
-		.bar.sorted{background:linear-gradient(180deg,#ffd4e5,#ffb0ca)}
-		.legend{display:flex;gap:12px;align-items:center;margin-top:10px;color:#7e3b5d}
-		.legend .item{display:flex;gap:8px;align-items:center}
-		.dot{width:14px;height:14px;border-radius:4px}
-		.dot.un{background:#ff9bcf}
-		.dot.cmp{background:#ff8aa9}
-		.dot.swap{background:#ff5f8f}
-		.dot.done{background:#df75a8}
+        /* 首頁選單按鈕的專屬樣式 */
+        .menu-link {
+            background: linear-gradient(180deg, #ffffff, #ffe8f2);
+            color: var(--text-main);
+            text-decoration: none;
+            padding: 16px 24px;
+            border-radius: 999px;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+            border: 1px solid #ffb6d5;
+            box-shadow: 0 4px 15px rgba(255, 163, 198, 0.2);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
 
-		.footerControls{display:flex;gap:8px;align-items:center;margin-top:14px}
-		.status{margin-left:auto;color:#7e3b5d}
-		.controls input[type=range]{width:160px}
-
-		.badge{background:rgba(255,255,255,.45);padding:6px 10px;border-radius:999px;color:#7e3b5d;font-size:13px}
-	</style>
+        /* 滑鼠移上去的動畫與顏色 */
+        .menu-link:hover {
+            transform: translateY(-3px) scale(1.02);
+            background: linear-gradient(180deg, var(--accent), var(--accent-2));
+            color: #ffffff;
+            border-color: var(--accent-2);
+            box-shadow: 0 8px 25px rgba(255, 82, 154, 0.4);
+        }
+        
+        /* 點擊時的回饋 */
+        .menu-link:active {
+            transform: translateY(1px);
+            filter: brightness(0.95);
+        }
+    </style>
 </head>
 <body>
-	<div class="wrap">
-		<h1>📚 排序演示 - 選擇一個演算法</h1>
-		<div class="meta">請選擇要查看的排序演算法</div>
+    <div class="wrap">
+        <h1>🌸 排序演算法演示</h1>
+        <div class="meta">請選擇要查看的排序演算法</div>
 
-		<div class="panel" style="display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;padding:40px">
-			<a href="bubble_sort.html" class="badge" style="padding:14px 20px;font-size:16px;display:inline-block">⚪ 氣泡排序 Bubble Sort</a>
-			<a href="selection_sort.html" class="badge" style="padding:14px 20px;font-size:16px;display:inline-block">🔷 選擇排序 Selection Sort</a>
-			<a href="insertion_sort.html" class="badge" style="padding:14px 20px;font-size:16px;display:inline-block">↪️ 插入排序 Insertion Sort</a>
-		</div>
-	</div>
-
+        <div class="panel">
+            <a href="bubble_sort.html" class="menu-link">⚪ 氣泡排序 Bubble Sort</a>
+            <a href="selection_sort.html" class="menu-link">🔷 選擇排序 Selection Sort</a>
+            <a href="insertion_sort.html" class="menu-link">↪️ 插入排序 Insertion Sort</a>
+            <a href="merge_sort.html" class="menu-link">🔀 合併排序 Merge Sort</a>
+            <a href="quick_sort.html" class="menu-link">⚡ 快速排序 Quick Sort</a>
+        </div>
+    </div>
 </body>
 </html>

@@ -3,16 +3,20 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>選擇排序 Selection Sort — 示範教學</title>
+    <title>快速排序 Quick Sort — 視覺化步驟示範</title>
     <style>
-        :root{--bg:#fff0f6;--panel:#ffd6e8;--muted:#7e3b5d;--accent:#ff8fbf;--accent-2:#ff6aa3;--ok:#ffb6d5;--danger:#dd426e;--card:#ffe1eb}
+        :root{
+            --bg:#fff0f6;--panel:#ffd6e8;--muted:#7e3b5d;--accent:#ff8fbf;--accent-2:#ff6aa3;--ok:#ffb6d5;--danger:#dd426e;--card:#ffe1eb
+        }
         *{box-sizing:border-box}
         body{margin:0;font-family:Inter,Segoe UI,Arial;background:linear-gradient(180deg,var(--bg),#ffd6e8);color:#4d1531;padding:28px}
         .wrap{max-width:980px;margin:0 auto}
         h1{display:flex;align-items:center;gap:10px;font-weight:600}
         .meta{color:var(--muted);margin-top:6px}
+
         .panel{background:var(--panel);border-radius:12px;padding:18px;margin-top:16px;box-shadow:0 8px 28px rgba(255,138,182,0.08)}
         .desc{background:rgba(255,255,255,.45);padding:12px;border-radius:8px;color:var(--muted)}
+
         .stats{display:flex;gap:10px;margin:12px 0;align-items:center}
         .stat{padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.55);font-size:13px;color:#4d1531}
         .controls{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
@@ -28,39 +32,49 @@
         #visualWrap{height:320px;margin-top:14px;display:flex;align-items:center;justify-content:center}
         #visual{width:100%;height:100%;display:flex;align-items:flex-end;gap:10px;padding:18px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.35),transparent)}
         .bar{flex:1;display:flex;align-items:flex-end;justify-content:center;background:linear-gradient(180deg,#ffc7df,#ff9bcf);color:#4d1531;border-radius:6px 6px 4px 4px;padding:6px 4px;font-weight:600}
+        
+        /* 視覺化狀態顏色 */
         .bar.compare{background:linear-gradient(180deg,#ffd86f,#ffb3a8)}
         .bar.swap{background:linear-gradient(180deg,#ff8aa9,#ff5f8f)}
         .bar.sorted{background:linear-gradient(180deg,#ffd4e5,#ffb0ca)}
-        .legend{display:flex;gap:12px;align-items:center;margin-top:10px;color:var(--muted)}
+        .bar.pivot{background:linear-gradient(180deg,#b088f9,#8b5cf6);color:white;} /* 新增 Pivot 顏色 */
+
+        .legend{display:flex;gap:12px;align-items:center;margin-top:10px;color:var(--muted);flex-wrap:wrap;}
         .legend .item{display:flex;gap:8px;align-items:center}
         .dot{width:14px;height:14px;border-radius:4px}
         .dot.un{background:#ff9bcf}
+        .dot.piv{background:#8b5cf6} /* 新增 Pivot 圖例顏色 */
         .dot.cmp{background:#ff8aa9}
         .dot.swap{background:#ff5f8f}
         .dot.done{background:#df75a8}
+
         .footerControls{display:flex;gap:8px;align-items:center;margin-top:14px}
         .status{margin-left:auto;color:var(--muted)}
         .controls input[type=range]{width:160px}
-        .badge{background:rgba(255,255,255,.45);padding:6px 10px;border-radius:999px;color:var(--muted);font-size:13px}
+
+        .badge{background:rgba(255,255,255,.45);padding:6px 10px;border-radius:999px;color:var(--muted);font-size:13px;text-decoration:none;display:inline-block;}
+        .badge:hover{background:rgba(255,255,255,.65);}
     </style>
 </head>
 <body>
     <div class="wrap">
-        <h1>🔷 選擇排序法</h1>
+        <h1>⚪ 快速排序法</h1>
         <div style="margin-top:8px">
             <a href="index.html" class="badge">回首頁</a>
             <a href="bubble_sort.html" class="badge" style="margin-left:8px">氣泡排序 Bubble Sort</a>
+            <a href="selection_sort.html" class="badge" style="margin-left:8px">選擇排序 Selection Sort</a>
             <a href="insertion_sort.html" class="badge" style="margin-left:8px">插入排序 Insertion Sort</a>
         </div>
-        <div class="meta">Selection Sort — 每輪選出最小/最大的元素並放到已排序區</div>
+
+        <div class="meta">Quick Sort — 視覺化步驟示範</div>
 
         <div class="panel">
             <div class="desc">
-                原理：選擇排序會在未排序的區間中找到最小（或最大）元素，將其與該區間的起始位置交換，然後將起始位置向右移動一格。重複直到所有元素排序完成。這個範例會逐步顯示比較與交換過程。
+                原理：快速排序採用「分治法」(Divide and Conquer)。每次會從數列中選定一個「基準值」(Pivot)，將比它小的元素移到它左邊，比它大的移到右邊（這個過程稱為分割 Partition）。接著，對左右兩個子數列分別重複此動作，直到所有子數列的長度為 1，即排序完成。
             </div>
 
             <div class="stats">
-                <div class="stat">第 <span id="pass">0</span> 輪 / 共 <span id="totalPass">0</span> 輪</div>
+                <div class="stat">分割次數：<span id="pass">0</span></div>
                 <div class="stat">比較次數：<span id="comp">0</span></div>
                 <div class="stat">交換次數：<span id="swaps">0</span></div>
                 <div class="stat">狀態：<span id="status">暫停</span></div>
@@ -88,9 +102,10 @@
 
             <div class="legend">
                 <div class="item"><span class="dot un"></span> 未排序</div>
+                <div class="item"><span class="dot piv"></span> 基準值 (Pivot)</div>
                 <div class="item"><span class="dot cmp"></span> 比較中</div>
                 <div class="item"><span class="dot swap"></span> 交換中</div>
-                <div class="item"><span class="dot done"></span> 已排序</div>
+                <div class="item"><span class="dot done"></span> 已歸位/已排序</div>
             </div>
         </div>
     </div>
@@ -104,7 +119,6 @@
         const randBtn = document.getElementById('rand');
         const visual = document.getElementById('visual');
         const passEl = document.getElementById('pass');
-        const totalPassEl = document.getElementById('totalPass');
         const compEl = document.getElementById('comp');
         const swapsEl = document.getElementById('swaps');
         const statusEl = document.getElementById('status');
@@ -116,8 +130,12 @@
         let paused = true;
         let stepRequested = false;
         let stats = {pass:0, comps:0, swaps:0};
+        
+        // 記錄 Pivot 索引與已排序(歸位)的索引，以便 Render 時上色
+        let pivotIdx = -1;
+        let sortedSet = new Set();
 
-        function randArray(n=7, max=100){
+        function randArray(n=10, max=100){
             return Array.from({length:n}, ()=>Math.floor(Math.random()*max)+1);
         }
 
@@ -134,6 +152,11 @@
                 const val = array[i];
                 const el = document.createElement('div');
                 el.className='bar';
+                
+                // 套用特定狀態顏色
+                if(sortedSet.has(i)) el.classList.add('sorted');
+                if(i === pivotIdx) el.classList.add('pivot');
+                
                 el.style.height = (Math.abs(val)/max*100) + '%';
                 el.style.margin = '0 6px';
                 el.textContent = val;
@@ -143,19 +166,20 @@
         }
 
         function setStatus(s){ statusEl.textContent = s; }
-        function updateStats(){ passEl.textContent = stats.pass; totalPassEl.textContent = Math.max(0,array.length-1); compEl.textContent = stats.comps; swapsEl.textContent = stats.swaps; }
+        function updateStats(){ passEl.textContent = stats.pass; compEl.textContent = stats.comps; swapsEl.textContent = stats.swaps; }
 
         function colorPair(i, j, mode){
             const bars = visual.children;
-            for(let k=0;k<bars.length;k++) bars[k].classList.remove('compare','swap','sorted');
+            // 移除 compare 和 swap，但不移除 sorted 和 pivot
+            for(let k=0;k<bars.length;k++) {
+                bars[k].classList.remove('compare','swap');
+            }
             if(mode==='compare'){
                 if(bars[i]) bars[i].classList.add('compare');
                 if(bars[j]) bars[j].classList.add('compare');
             }else if(mode==='swap'){
                 if(bars[i]) bars[i].classList.add('swap');
                 if(bars[j]) bars[j].classList.add('swap');
-            }else if(mode==='sorted'){
-                for(let s=0;s<stats.pass;s++){ if(bars[s]) bars[s].classList.add('sorted'); }
             }
         }
 
@@ -166,57 +190,114 @@
             if(stepRequested){ stepRequested=false; paused=true; }
         }
 
-        async function selectionSortControlled(){
-            working = true; paused = false; setStatus('執行中');
-            stats = {pass:0, comps:0, swaps:0}; updateStats();
-            const asc = orderEl.value==='asc';
-            const n = array.length;
-            for(let i=0;i<n-1;i++){
-                stats.pass = i+1; updateStats();
-                let minIdx = i;
-                for(let j=i+1;j<n;j++){
-                    if(paused) await doPause();
-                    stats.comps++; updateStats();
-                    colorPair(minIdx,j,'compare');
-                    await sleep(Number(speedEl.value));
-                    if(asc ? array[j] < array[minIdx] : array[j] > array[minIdx]){
-                        minIdx = j;
+        // --- 快速排序核心邏輯 ---
+        async function partition(low, high) {
+            stats.pass++; updateStats();
+            const asc = orderEl.value === 'asc';
+            let pivotValue = array[high];
+            pivotIdx = high; 
+            render(); // 顯示當前 Pivot
+
+            let i = low - 1;
+
+            for (let j = low; j < high; j++) {
+                if (paused) await doPause();
+                if (!working) return;
+
+                stats.comps++; updateStats();
+                colorPair(j, high, 'compare');
+                await sleep(Number(speedEl.value));
+
+                if (asc ? array[j] < pivotValue : array[j] > pivotValue) {
+                    i++;
+                    if (i !== j) {
+                        colorPair(i, j, 'swap');
+                        await sleep(Number(speedEl.value)/2);
+                        
+                        let t = array[i]; array[i]=array[j]; array[j]=t;
+                        stats.swaps++; updateStats();
+                        
+                        render();
+                        colorPair(i, j, 'swap');
+                        await sleep(Number(speedEl.value)/2);
                     }
-                    render();
                 }
-                if(minIdx !== i){
-                    colorPair(i,minIdx,'swap');
-                    await sleep(Number(speedEl.value)/2);
-                    const t = array[i]; array[i]=array[minIdx]; array[minIdx]=t;
-                    stats.swaps++; updateStats();
-                    render();
-                    await sleep(Number(speedEl.value)/2);
-                }
-                colorPair(null,null,'sorted');
+                render(); 
+            }
+            
+            if (paused) await doPause();
+            if (!working) return;
+
+            i++;
+            if (i !== high) {
+                colorPair(i, high, 'swap');
+                await sleep(Number(speedEl.value)/2);
+                
+                let t = array[i]; array[i]=array[high]; array[high]=t;
+                stats.swaps++; updateStats();
+                
+                pivotIdx = i; // Pivot 移動到新位置
+                render();
+                colorPair(i, high, 'swap');
+                await sleep(Number(speedEl.value)/2);
+            }
+            
+            pivotIdx = -1;
+            sortedSet.add(i); // Pivot 確定歸位
+            render();
+            return i;
+        }
+
+        async function quickSortMain(low, high) {
+            if (!working) return;
+            if (low < high) {
+                let pi = await partition(low, high);
+                if (!working) return;
+                await quickSortMain(low, pi - 1);
+                await quickSortMain(pi + 1, high);
+            } else if (low === high) {
+                // 單個元素自然排序完成
+                sortedSet.add(low);
                 render();
             }
-            const bars = visual.children;
-            for(let k=0;k<bars.length;k++) bars[k].classList.add('sorted');
+        }
+
+        async function quickSortControlled(){
+            working = true; paused = false; setStatus('執行中');
+            stats = {pass:0, comps:0, swaps:0}; updateStats();
+            sortedSet.clear(); pivotIdx = -1;
+            
+            await quickSortMain(0, array.length - 1);
+            
+            if (!working) return; // 中途重置
+
+            // 確保所有元素皆標記為已排序
+            for(let i=0; i<array.length; i++) sortedSet.add(i);
+            pivotIdx = -1;
+            render();
             setStatus('完成'); working=false; paused=true; updateStats();
         }
 
+        // --- 事件綁定 ---
         startBtn.addEventListener('click', async ()=>{
             if(working){ paused=false; setStatus('執行中'); return; }
             const parsed = parseInput(inputEl.value);
             if(parsed.length>0) array = parsed.slice();
-            if(array.length===0){ array = randArray(7,100); inputEl.value = array.join(','); }
+            if(array.length===0){ array = randArray(10,100); inputEl.value = array.join(','); }
+            sortedSet.clear(); pivotIdx = -1;
             render();
-            selectionSortControlled();
+            quickSortControlled();
         });
 
         pauseBtn.addEventListener('click', ()=>{ if(!working) return; paused=true; setStatus('暫停'); });
 
         stepBtn.addEventListener('click', ()=>{ if(!working){ startBtn.click(); paused=true; } stepRequested=true; paused=false; setStatus('單步'); });
 
-        resetBtn.addEventListener('click', ()=>{ working=false; paused=true; stepRequested=false; array=[]; inputEl.value=''; visual.innerHTML=''; stats={pass:0,comps:0,swaps:0}; updateStats(); setStatus('暫停'); });
+        resetBtn.addEventListener('click', ()=>{ working=false; paused=true; stepRequested=false; array=[]; inputEl.value=''; visual.innerHTML=''; stats={pass:0,comps:0,swaps:0}; sortedSet.clear(); pivotIdx = -1; updateStats(); setStatus('暫停'); });
 
-        randBtn.addEventListener('click', ()=>{ const a = randArray(7,100); array=a; inputEl.value=a.join(','); render(); stats={pass:0,comps:0,swaps:0}; updateStats(); setStatus('暫停'); });
+        randBtn.addEventListener('click', ()=>{ const a = randArray(10,100); array=a; inputEl.value=a.join(','); sortedSet.clear(); pivotIdx = -1; render(); stats={pass:0,comps:0,swaps:0}; updateStats(); setStatus('暫停'); });
 
+        // initial demo
         array = [64,34,25,12,22,11,90]; inputEl.value = array.join(','); render(); updateStats(); setStatus('暫停');
     </script>
 </body>

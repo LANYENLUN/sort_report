@@ -5,39 +5,43 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>插入排序 Insertion Sort — 示範教學</title>
     <style>
-        :root{--bg:#0f1724;--panel:#0b1220;--muted:#9aa7c0;--accent:#4ac1ff;--accent-2:#ffa94d;--ok:#2bd39b;--danger:#ff6b6b;--card:#0b1220}
+        :root{--bg:#fff0f6;--panel:#ffd6e8;--muted:#7e3b5d;--accent:#ff8fbf;--accent-2:#ff6aa3;--ok:#ffb6d5;--danger:#dd426e;--card:#ffe1eb}
         *{box-sizing:border-box}
-        body{margin:0;font-family:Inter,Segoe UI,Arial;background:linear-gradient(180deg,var(--bg),#07101a);color:#e6eef8;padding:28px}
+        body{margin:0;font-family:Inter,Segoe UI,Arial;background:linear-gradient(180deg,var(--bg),#ffd6e8);color:#4d1531;padding:28px}
         .wrap{max-width:980px;margin:0 auto}
         h1{display:flex;align-items:center;gap:10px;font-weight:600}
         .meta{color:var(--muted);margin-top:6px}
-        .panel{background:var(--panel);border-radius:12px;padding:18px;margin-top:16px;box-shadow:0 6px 18px rgba(2,6,23,.6)}
-        .desc{background:#071428;padding:12px;border-radius:8px;color:var(--muted)}
+        .panel{background:var(--panel);border-radius:12px;padding:18px;margin-top:16px;box-shadow:0 8px 28px rgba(255,138,182,0.08)}
+        .desc{background:rgba(255,255,255,.45);padding:12px;border-radius:8px;color:var(--muted)}
         .stats{display:flex;gap:10px;margin:12px 0;align-items:center}
-        .stat{padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.03);font-size:13px}
+        .stat{padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.55);font-size:13px;color:#4d1531}
         .controls{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
-        input[type=text]{padding:8px;border-radius:8px;border:none;background:#071428;color:inherit;min-width:260px}
-        button{background:linear-gradient(180deg,var(--accent),#2aa8e6);border:none;color:#04212b;padding:10px 14px;border-radius:999px;cursor:pointer}
-        button.ghost{background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,.04)}
-        button.warn{background:linear-gradient(180deg,var(--accent-2),#ff9244);color:#05120b}
+        input[type=text]{padding:8px;border-radius:8px;border:none;background:rgba(255,255,255,.6);color:#4d1531;min-width:260px}
+        button{background:linear-gradient(180deg,var(--accent),var(--accent-2));border:none;color:white;padding:10px 14px;border-radius:999px;cursor:pointer;transition:transform .12s ease,filter .12s ease,box-shadow .12s ease}
+        button:hover{transform:translateY(-2px);filter:brightness(1.04);box-shadow:0 6px 20px rgba(255,136,183,0.12)}
+        button:active{transform:translateY(0);filter:brightness(.95)}
+        button:focus{outline:3px solid rgba(255,136,183,0.18);outline-offset:2px}
+        button.ghost{background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,.35)}
+        button.ghost:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.5)}
+        button.warn{background:linear-gradient(180deg,var(--accent-2),#ee5d8f);color:white}
         .small{padding:8px 10px;font-size:13px}
         #visualWrap{height:320px;margin-top:14px;display:flex;align-items:center;justify-content:center}
-        #visual{width:100%;height:100%;display:flex;align-items:flex-end;gap:10px;padding:18px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent)}
-        .bar{flex:1;display:flex;align-items:flex-end;justify-content:center;background:linear-gradient(180deg,#2b8fd9,#1b6aa8);color:#fff;border-radius:6px 6px 4px 4px;padding:6px 4px;font-weight:600}
-        .bar.compare{background:linear-gradient(180deg,#ffa94d,#ff7a00)}
-        .bar.swap{background:linear-gradient(180deg,#ff6b6b,#ff3956)}
-        .bar.sorted{background:linear-gradient(180deg,#2bd39b,#18a172)}
+        #visual{width:100%;height:100%;display:flex;align-items:flex-end;gap:10px;padding:18px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.35),transparent)}
+        .bar{flex:1;display:flex;align-items:flex-end;justify-content:center;background:linear-gradient(180deg,#ffc7df,#ff9bcf);color:#4d1531;border-radius:6px 6px 4px 4px;padding:6px 4px;font-weight:600}
+        .bar.compare{background:linear-gradient(180deg,#ffd86f,#ffb3a8)}
+        .bar.swap{background:linear-gradient(180deg,#ff8aa9,#ff5f8f)}
+        .bar.sorted{background:linear-gradient(180deg,#ffd4e5,#ffb0ca)}
         .legend{display:flex;gap:12px;align-items:center;margin-top:10px;color:var(--muted)}
         .legend .item{display:flex;gap:8px;align-items:center}
         .dot{width:14px;height:14px;border-radius:4px}
-        .dot.un{background:#2b8fd9}
-        .dot.cmp{background:#ffa94d}
-        .dot.swap{background:#ff6b6b}
-        .dot.done{background:#2bd39b}
+        .dot.un{background:#ff9bcf}
+        .dot.cmp{background:#ff8aa9}
+        .dot.swap{background:#ff5f8f}
+        .dot.done{background:#df75a8}
         .footerControls{display:flex;gap:8px;align-items:center;margin-top:14px}
         .status{margin-left:auto;color:var(--muted)}
         .controls input[type=range]{width:160px}
-        .badge{background:rgba(255,255,255,.03);padding:6px 10px;border-radius:999px;color:var(--muted);font-size:13px}
+        .badge{background:rgba(255,255,255,.45);padding:6px 10px;border-radius:999px;color:var(--muted);font-size:13px}
     </style>
 </head>
 <body>
